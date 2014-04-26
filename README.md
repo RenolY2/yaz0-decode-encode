@@ -1,8 +1,17 @@
 yaz0-decode-encode
 ==================
 
-A module written in Python that provides yaz0-compatible compression and decompression methods.
+A module written in Python that provides yaz0-compatible compression and decompression methods written by RenolY2/Yoshi2.
 
+Notes
+==================
+Please note that this module still needs to undergo broad testing. While I did
+personally test the module myself, there can still be some special cases which
+I haven't accounted for yet. If you do encounter issues, don't hesitate to report it
+and include a description of what file is causing the problem so that I can fix it.
+
+I used the specifications at http://www.amnoid.de/gc/yaz0.txt to write an
+encoder for the format.
 
 Usage
 ==================
@@ -55,4 +64,5 @@ fileobj.close()
 
 writefile = open("yaz0_file", "wb")
 writefile.write(output.getvalue())
+writefile.close()
 ```
