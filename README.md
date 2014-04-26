@@ -10,8 +10,7 @@ personally test the module myself, there can still be some special cases which
 I haven't accounted for yet. If you do encounter issues, don't hesitate to report it
 and include a description of what file is causing the problem so that I can fix it.
 
-I used the specifications at http://www.amnoid.de/gc/yaz0.txt to write an
-encoder for the format.
+I used the specifications at http://www.amnoid.de/gc/yaz0.txt to write a decoder for the format.
 
 Usage
 ==================
