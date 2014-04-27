@@ -32,12 +32,12 @@ class yaz0():
         
         
         if self.compressFlag == False:
-            self.header = fileobj.read(4)
+            self.header = self.fileobj.read(4)
             if self.header != "Yaz0":
                 raise RuntimeError("File is not Yaz0-compressed! Header: {0}".format(self.header))
             
-            self.decompressedSize = struct.unpack(">I", fileobj.read(4))[0]
-            nothing = fileobj.read(8) # Unused data
+            self.decompressedSize = struct.unpack(">I", self.fileobj.read(4))[0]
+            nothing = self.fileobj.read(8) # Unused data
         
         else:
             self.output.write("Yaz0")
@@ -112,10 +112,18 @@ class yaz0():
                     
                     if len(toCopy) < byteCount:
                         # The data we have read is less than what we should read, 
-                        # so we will pad he rest with 0x00. 
-                        # Hard to tell if this is the correct way to do it,
-                        # but it seems to be working.
-                        toCopy = toCopy.ljust(byteCount, chr(0x00))
+                        # so we will repeat the data we have read so far until we 
+                        # have reached the bytecount.
+                        newCopy = [toCopy]
+                        diff = byteCount - len(toCopy)
+                        
+                        # Append full copy of the current string to our new copy
+                        for i in range(diff // len(toCopy)):
+                            newCopy.append(toCopy)
+                        
+                        # Append the rest of the copy to the new copy
+                        newCopy.append(toCopy[:(diff % len(toCopy))])
+                        toCopy = "".join(newCopy)
                         
                     #print "Copying: '{0}', {1} bytes at position {2}".format(toCopy, byteCount, moveTo)
                     
