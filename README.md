@@ -75,13 +75,19 @@ Its decompressed size is 13.875 KiB (14208 bytes). It is compressed again using 
 Time taken is rounded to the third place after the decimal point for yaz0, and to the fourth place after the decimal point for zlib.
 
 --python yaz0--
+
 Time taken for compression: 1.358 seconds
+
 compressed size: ~9.32 KiB (9545 bytes)
+
 Time taken for decompression: 0.017 seconds
 
 --zlib--
+
 Time taken for compression: 0.0018 seconds
+
 compressed size: ~7.86 KiB (8048 bytes)
+
 Time taken for decompression: 0.0002 seconds
 
 For comparison, the original file in the game has a compressed size of ~9.1 KiB (9313 bytes), slightly better than the python implementation, but much worse than what zlib can achieve. As I am lacking statistics on how the yaz0 algorithm performs on the original hardware, it cannot be easily said that zlib is the clear winner.
