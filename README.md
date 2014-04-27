@@ -74,14 +74,14 @@ In the following statistics a file has been extracted from Zelda: The Wind Waker
 Its decompressed size is 13.875 KiB (14208 bytes). It is compressed again using both the python implementation of yaz0, and python's built-in zlib module, using the highest compression level. This allows us to roughly compare the performance of both modules. Finally, the same compressed data will be decompressed again.
 Time taken is rounded to the third place after the decimal point for yaz0, and to the fourth place after the decimal point for zlib.
 
---python yaz0--
+python yaz0:
 
 Time taken for compression: 1.358 seconds
 compressed size: ~9.32 KiB (9545 bytes)
 Time taken for decompression: 0.017 seconds
 
 
---zlib--
+zlib:
 
 Time taken for compression: 0.0018 seconds
 compressed size: ~7.86 KiB (8048 bytes)
