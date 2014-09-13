@@ -67,6 +67,64 @@ writefile.close()
 ```
 
 
+It is also possible to use the helper functions provided
+by the yaz0 module for compression and decompression.
+The following code will make use of the 6 helper methods
+(3 for compression, 3 for decompression) provided by the module:
+
+```python
+import yaz0
+from cStringIO import StringIO
+
+# Data with a lot of repeated characters can be compressed well.
+testData = "A"*64
+
+# Method 1&2: Using compress and decompress, which work on strings directly:
+compressedData = yaz0.compress(testData, compressLevel = 9)
+decompressedData = yaz0.decompress(compressedData)
+
+# We need to make sure that the decompressed data 
+# now is the same as the original data.
+assert decompressedData == testData 
+
+# Method 3&4: Using compress_fileobj and decompress_fileobj, which work on file-like objects:
+test_fileObj = StringIO(testData)
+
+compressedData_obj = yaz0.compress_fileobj(test_fileObj, compressLevel = 9)
+decompressedData_obj = yaz0.decompress_fileobj(compressedData_obj)
+
+decompressedData = decompressedData_obj.getvalue() 
+assert decompressedData == testData
+
+# Method 5&6: Using compress_file and decompress_file, which work on file on the HDD:
+# If you omit the outputPath for compress_file and decompress_file, the functions
+# will return a StringIO object instead of writing the results to a file.
+
+# First we create our test file using the test data.
+with open("uncompressedData.txt", "w") as f:
+    f.write(testData)
+
+yaz0.compress_file("uncompressedData.txt", outputPath = "compressedData.bin", 
+                   compressLevel = 9)
+
+yaz0.decompress_file("compressedData.bin", outputPath = "uncompressedData2.txt")
+
+
+# Again, we make sure that the content of the decompressed file is the same as 
+# the original data.
+with open("uncompressedData2.txt", "r") as f:
+    decompressedData = f.read()
+
+assert decompressedData == testData
+
+print "If you see this message, everything went fine! :)"
+
+```
+
+					
+	
+
+
 Performance Statistics
 ==================
 
