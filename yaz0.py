@@ -55,6 +55,7 @@ class yaz0():
         while output.tell() < self.decompressedSize:
             # The codebyte tells us what we need to do for the next 8 steps.
             codeByte = ord(fileobj.read(1))
+            print "codeByte {0} at position {1}".format(hex(codeByte), fileobj.tell())
             
             if fileobj.tell() >= self.maxsize:
                 # We have reached the end of the compressed file, but the amount
@@ -63,7 +64,7 @@ class yaz0():
                 raise RuntimeError("The end of file has been reached."
                                    "{0} bytes out of {1} written.".format(output.tell(), self.decompressedSize))
             
-            for bit in self.__bit_iter__(codeByte):
+            for bit_number, bit in enumerate(self.__bit_iter__(codeByte)):
                 if bit:
                     ## The bit is set to 1, we do not need to decompress anything. 
                     ## Write the data to the output.
@@ -77,6 +78,12 @@ class yaz0():
                                )
                     
                 else:
+                    if output.tell() >= self.decompressedSize:
+                        print ("Bit at position {0} in byte {1} tells us that there "
+                               "is more data to be decompressed, but we have reached "
+                               "the decompressed size!".format(bit_number, hex(codeByte)))
+                        continue
+                    
                     ## Time to work some decompression magic. The next two bytes will tell us
                     ## where we find the data to be copied and how much data it is.
                     byte1 = ord(fileobj.read(1))
@@ -101,7 +108,7 @@ class yaz0():
                     
                     if moveTo < 0: 
                         raise RuntimeError("Invalid Seek Position: Trying to move from "
-                                           "{0} to {1} (MoveDistance: {2}".format(normalPosition, moveTo,
+                                           "{0} to {1} (MoveDistance: {2})".format(normalPosition, moveTo,
                                                                                   moveDistance+1))
                         
                     # We move back to a position that has the data we will copy to the front.
@@ -318,7 +325,78 @@ class yaz0():
         for i in xrange(8):
             result = (byte << i) & 0x80
             yield result != 0
-    
+
+
+
+#
+#    Helper Functions for easier usage of
+#    the compress & decompress methods of the module.
+#
+
+# Take a compressed string, decompress it and return the
+# results as a string. 
+def decompress(string):
+    stringObj = StringIO(string)
+    yaz0obj = yaz0(stringObj, compress = False)
+    return yaz0obj.decompress().getvalue()
+
+# Take a file-like object, decompress it and return the
+# results as a StringIO object.
+def decompress_fileobj(fileobj):
+    yaz0obj = yaz0(fileobj, compress = False)
+    return yaz0obj.decompress()
+
+# Take a file name and decompress the contents of that file. 
+# If outputPath is given, save the results to a file with
+# the name defined by outputPath, otherwise return the results
+# as a StringIO object.
+def decompress_file(filenamePath, outputPath = None):
+    with open(filenamePath, "rb") as fileobj:
+        yaz0obj = yaz0(fileobj, compress = False)
+        
+        result = yaz0obj.decompress()
+        
+        if outputPath != None:
+            with open(outputPath, "wb") as output:
+                output.write(result.getvalue())
+            
+            result = None
+            
+    return result
+
+
+# Take an uncompressed string, compress it and
+# return the results as a string.
+def compress(string, compressLevel = 9):
+    stringObj = StringIO(string)
+    yaz0obj = yaz0(stringObj, compress = True)
+    return yaz0obj.compress(compressLevel).getvalue()
+
+# Take a file-like object, compress it and
+# return the results as a StringIO object.
+def compress_fileobj(fileobj, compressLevel = 9):
+    yaz0obj = yaz0(fileobj, compress = True)
+    return yaz0obj.compress(compressLevel)
+
+# Take a file name and compress the contents of that file.
+# If outputPath is not None, write the results to a file
+# with the name defined by outputPath, otherwise return
+# results as a StringIO object.
+def compress_file(filenamePath, outputPath = None, compressLevel = 9):
+    with open(filenamePath, "rb") as fileobj:
+        yaz0obj = yaz0(fileobj, compress = True)
+        
+        result = yaz0obj.compress(compressLevel)
+        
+        if outputPath != None:
+            with open(outputPath, "wb") as output:
+                output.write(result.getvalue())
+            
+            result = None
+            
+    return result
+
+
 
 if __name__ == "__main__":
     compress = True
